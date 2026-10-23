@@ -95,3 +95,7 @@ C:\Users\Julio\Documents\Universidad\Programación\ProyectoLoginMVC\ProyectoLogi
 C:\Users\Julio\Documents\Universidad\Programación\ProyectoLoginMVC\ProyectoLoginMVC\obj\Debug\net10.0\ProyectoLoginMVC.pdb
 C:\Users\Julio\Documents\Universidad\Programación\ProyectoLoginMVC\ProyectoLoginMVC\obj\Debug\net10.0\ProyectoLoginMVC.genruntimeconfig.cache
 C:\Users\Julio\Documents\Universidad\Programación\ProyectoLoginMVC\ProyectoLoginMVC\obj\Debug\net10.0\ref\ProyectoLoginMVC.dll
+C:\Users\Julio\Documents\Universidad\Programación\ProyectoLoginMVC\ProyectoLoginMVC\bin\Debug\net10.0\BCrypt-Net-Next.dll
+C:\Users\Julio\Documents\Universidad\Programación\ProyectoLoginMVC\ProyectoLoginMVC\obj\Debug\net10.0\ProyectoLoginMVC.csproj.AssemblyReference.cache
+C:\Users\Julio\Documents\Universidad\Programación\ProyectoLoginMVC\ProyectoLoginMVC\obj\Debug\net10.0\ProyectoLoginMVC.sourcelink.json
+C:\Users\Julio\Documents\Universidad\Programación\ProyectoLoginMVC\ProyectoLoginMVC\obj\Debug\net10.0\Proyecto.56A6B790.Up2Date

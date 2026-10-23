@@ -1,0 +1,42 @@
+# Archivos generados por .NET
+[Bb]in/
+[Oo]bj/
+[Aa]rtifacts/
+[Pp]ublish/
+
+# Configuración local de Visual Studio, Rider y VS Code
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.slnLaunch.user
+
+# Resultados de pruebas y cobertura
+[Tt]est[Rr]esults/
+coverage/
+*.coverage
+*.coveragexml
+
+# Registros y archivos temporales
+*.log
+*.tmp
+*.bak
+
+# Configuración local y secretos
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+appsettings.*.Local.json
+*.pfx
+*.p12
+*.publishsettings
+*.pubxml.user
+
+# Archivos del sistema operativo
+Thumbs.db
+Desktop.ini
+.DS_Store
