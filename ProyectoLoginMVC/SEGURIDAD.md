@@ -1,61 +1,61 @@
-# Contraseñas con BCrypt
+﻿# Verificación de PasswordService
 
-El proyecto ya referencia BCrypt.Net-Next 4.2.0. `PasswordService` se registra
-como servicio scoped en `Program.cs` y utiliza `BCrypt.Net.BCrypt.HashPassword`
-y `BCrypt.Net.BCrypt.Verify`. La biblioteca genera el salt automáticamente.
-Referencia: https://github.com/BcryptNet/bcrypt.net/tree/4.2.0
+El servicio usa BCrypt.Net-Next 4.2.0 y está registrado como scoped en Program.cs.
+HashPassword genera el salt automáticamente. VerifyPassword recibe la contraseña
+original y el PasswordHash almacenado; nunca se comparan dos hashes nuevos.
+Referencia de la biblioteca: https://github.com/BcryptNet/bcrypt.net
 
-## Generar el hash de admin
+## Comprobar el administrador existente
 
-Desde la carpeta que contiene `ProyectoLoginMVC.csproj`, en una terminal:
+Desde una terminal interactiva en la carpeta del proyecto:
 
 ```powershell
-dotnet run --no-launch-profile -- --generar-hash-admin
+dotnet run --no-launch-profile -- --verificar-admin
 ```
 
-Introduce la contraseña y repítela. La entrada permanece oculta y solo se
-mantiene en memoria durante la ejecución. No pases contraseñas como argumentos
-ni las escribas en archivos. Se rechazan entradas vacías y mayores de 72 bytes
-UTF-8 (las letras acentuadas pueden ocupar más de un byte).
+1. Acepta DESKTOP-T9VI6PL o escribe tu servidor/instancia.
+2. Introduce sa para autenticación SQL o deja vacío para Windows.
+3. Si elegiste autenticación SQL, introduce su contraseña con entrada oculta.
+4. Tras consultar el hash, introduce la contraseña original del usuario admin,
+   también con entrada oculta. Se muestra únicamente si coincide.
+5. Repite con una contraseña incorrecta: debe indicar contraseña incorrecta.
 
-La utilidad verifica el hash y muestra el INSERT completo con ese hash.
-Copia desde `USE DB_LoginMVC;` hasta el último `GO` y ejecútalo en una ventana
-de consulta de SQL Server Management Studio, conectada a tu instancia.
-Debe existir el rol `Administrador` y no debe existir otro usuario `admin`.
-Se utiliza `IdPuesto = NULL`, `NivelAcceso = 10` y `Activo = 1`, como en el
-INSERT existente. No es necesario indicar `IdUsuario` ni `FechaRegistro`:
-la tabla ya tiene valores predeterminados. La utilidad no ejecuta SQL.
-
-Puedes comprobar el registro sin consultar el hash:
+Requiere sqlcmd instalado y disponible en PATH. La utilidad únicamente ejecuta:
 
 ```sql
-USE DB_LoginMVC;
-SELECT Nombre, Apellido, Username, IdRol, IdPuesto, NivelAcceso, Activo
-FROM dbo.Usuarios
-WHERE Username = 'admin';
+SELECT CONVERT(VARCHAR(MAX), CONVERT(VARBINARY(MAX), PasswordHash), 2)
+FROM dbo.Usuarios WHERE Username = 'admin';
 ```
 
-## Probar el servicio
+El transporte hexadecimal permite detectar espacios adicionales sin recortar el
+hash original. Se exigen 60 bytes, el prefijo BCrypt y un costo entre 04 y 31.
+El resultado es únicamente `Contraseña correcta` o `Contraseña incorrecta`.
+Las solicitudes de entrada y los errores de conexión o formato se envían a stderr;
+un error de consulta o formato no se presenta como contraseña incorrecta.
 
-Después de mostrar el INSERT, la utilidad solicita otra contraseña y muestra
-si coincide con el mismo hash. Prueba primero la correcta; repite la ejecución
-y prueba una incorrecta para obtener `no coincide`. Cada ejecución genera un
-hash nuevo, aunque introduzcas la misma contraseña.
+La base seleccionada es DB_LoginMVC. No inserta ni modifica registros, no inicia
+el servidor web y no imprime el hash. Las contraseñas solo se usan en memoria;
+la contraseña SQL se entrega a sqlcmd mediante el entorno de ese proceso hijo,
+no mediante argumentos ni archivos. No compartas contraseñas por chat ni las
+incluyas en comandos, archivos o el repositorio.
 
-Desde código que reciba `PasswordService` por inyección de dependencias:
+Una coincidencia devuelve código de salida 0. Una contraseña incorrecta, un hash
+no válido o un fallo de consulta devuelve código 1. Un fallo de conexión no es
+una prueba de que la contraseña del administrador sea incorrecta.
 
-```csharp
-string hash = passwordService.HashPassword(password);
-bool coincide = passwordService.VerifyPassword(password, hash);
-```
+## Integración posterior
 
-`password` debe proceder de una entrada en ejecución y `hash` puede proceder
-de `PasswordHash` en la base de datos. Nunca compares dos hashes nuevos.
+El compañero puede recibir PasswordService mediante inyección de dependencias
+y llamar a VerifyPassword(contraseñaIntroducida, usuario.PasswordHash).
+HashPassword rechaza entradas vacías o mayores de 72 bytes UTF-8. VerifyPassword
+rechaza entradas vacías, nulas, mayores de 72 bytes y hashes de formato inválido.
+No se han agregado login, cookies, sesiones ni cambios de base de datos.
 
-Para compilar: `dotnet build`. Para iniciar normalmente el sitio: `dotnet run`.
+Para compilar: dotnet build.
 
-## Retirar la utilidad temporal
+## Retirar la comprobación temporal
 
-Elimina `Tools/AdminPasswordTool.cs`, el `using ProyectoLoginMVC.Tools` y el
-bloque de `--generar-hash-admin` en `Program.cs`. Conserva `PasswordService`
-y su registro en inyección de dependencias.
+Cuando se haya confirmado el registro real, elimina Tools/AdminPasswordTool.cs,
+el using ProyectoLoginMVC.Tools y el bloque --verificar-admin de Program.cs.
+Conserva Services/PasswordService.cs y su registro AddScoped. El generador de
+INSERT anterior ya se retiró porque el administrador está registrado.

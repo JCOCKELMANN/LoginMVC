@@ -1,64 +1,102 @@
+﻿using System.Diagnostics;
 using ProyectoLoginMVC.Services;
 
 namespace ProyectoLoginMVC.Tools;
 
-// Utilidad temporal. No escribe archivos ni se conecta a SQL Server.
+// Comprobación manual temporal de solo lectura con sqlcmd.
 internal static class AdminPasswordTool
 {
     public static void Run(PasswordService service)
     {
         if (Console.IsInputRedirected)
         {
-            Console.Error.WriteLine("Ejecuta esta utilidad en una terminal interactiva.");
-            Environment.ExitCode = 1;
+            Fail("Ejecuta esta utilidad en una terminal interactiva.");
             return;
         }
 
-        Console.Write("Contraseña para admin (no se mostrará): ");
-        var password = ReadPassword();
-        Console.Write("Repite la contraseña: ");
-        var confirmation = ReadPassword();
+        Console.Error.Write("Servidor SQL Server [DESKTOP-T9VI6PL]: ");
+        var server = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(server))
+            server = "DESKTOP-T9VI6PL";
 
-        if (password != confirmation)
-        {
-            Console.Error.WriteLine("Las contraseñas no coinciden. Ejecuta de nuevo la utilidad.");
-            Environment.ExitCode = 1;
-            return;
-        }
+        Console.Error.Write("Usuario SQL (Enter para autenticación de Windows): ");
+        var sqlUser = Console.ReadLine();
 
         string hash;
         try
         {
-            hash = service.HashPassword(password);
+            var startInfo = new ProcessStartInfo("sqlcmd")
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+            foreach (var argument in new[]
+            {
+                "-S", server, "-d", "DB_LoginMVC", "-b", "-l", "5", "-t", "10",
+                "-h", "-1", "-W", "-Q",
+                // El transporte hexadecimal conserva espacios y bytes del valor almacenado.
+                "SET NOCOUNT ON; SELECT CONVERT(VARCHAR(MAX), CONVERT(VARBINARY(MAX), PasswordHash), 2) FROM dbo.Usuarios WHERE Username = 'admin';"
+            })
+                startInfo.ArgumentList.Add(argument);
+
+            if (string.IsNullOrWhiteSpace(sqlUser))
+                startInfo.ArgumentList.Add("-E");
+            else
+            {
+                startInfo.ArgumentList.Add("-U");
+                startInfo.ArgumentList.Add(sqlUser);
+                Console.Error.Write("Contraseña de SQL Server (entrada oculta): ");
+                // Solo en el entorno del proceso hijo; nunca como argumento ni en archivos.
+                startInfo.Environment["SQLCMDPASSWORD"] = ReadPassword();
+            }
+
+            using var process = Process.Start(startInfo)
+                ?? throw new InvalidOperationException("No se pudo iniciar sqlcmd.");
+            startInfo.Environment.Remove("SQLCMDPASSWORD");
+            var output = process.StandardOutput.ReadToEnd();
+            _ = process.StandardError.ReadToEnd();
+            process.WaitForExit();
+            if (process.ExitCode != 0)
+            {
+                Fail("No se pudo consultar SQL Server. Comprueba la instancia, las credenciales y la conexión con SSMS.");
+                return;
+            }
+
+            // Solo quitamos el formato de salida de sqlcmd, nunca espacios del hash.
+            var hex = output.Trim();
+            if (!System.Text.RegularExpressions.Regex.IsMatch(hex, @"\A[0-9A-Fa-f]{120}\z"))
+            {
+                Fail("No se encontró un único hash de 60 bytes para admin. Revisa el registro, su longitud y posibles espacios adicionales.");
+                return;
+            }
+
+            hash = System.Text.Encoding.ASCII.GetString(Convert.FromHexString(hex));
+            if (!System.Text.RegularExpressions.Regex.IsMatch(hash,
+                @"\A\$2[aby]\$(0[4-9]|[12][0-9]|3[01])\$[./A-Za-z0-9]{53}\z"))
+            {
+                Fail("El hash almacenado no tiene el formato BCrypt esperado (60 caracteres, prefijo y costo válidos).");
+                return;
+            }
         }
-        catch (ArgumentException)
+        catch (System.ComponentModel.Win32Exception)
         {
-            Console.Error.WriteLine("Introduce una contraseña no vacía de hasta 72 bytes UTF-8.");
-            Environment.ExitCode = 1;
+            Fail("No se pudo ejecutar sqlcmd. Comprueba que esté instalado y disponible en PATH.");
             return;
         }
 
-        if (!service.VerifyPassword(confirmation, hash))
-            throw new InvalidOperationException("No se pudo verificar el hash generado.");
+        Console.Error.Write("Contraseña que deseas verificar para admin (entrada oculta): ");
+        var matches = service.VerifyPassword(ReadPassword(), hash);
+        Console.WriteLine(matches ? "Contraseña correcta" : "Contraseña incorrecta");
+        if (!matches)
+            Environment.ExitCode = 1;
+    }
 
-        Console.WriteLine($"\nHash BCrypt: {hash}");
-        Console.WriteLine("Verificación de la contraseña: correcta.");
-        Console.WriteLine("\nCopia y ejecuta este INSERT en SQL Server:");
-        Console.WriteLine($"""
-            USE DB_LoginMVC;
-            GO
-            INSERT INTO dbo.Usuarios
-                (Nombre, Apellido, Username, PasswordHash, IdRol, IdPuesto, NivelAcceso, Activo)
-            VALUES
-                ('Administrador', 'Sistema', 'admin', '{hash}',
-                 (SELECT IdRol FROM dbo.Roles WHERE NombreRol = 'Administrador'), NULL, 10, 1);
-            GO
-            """);
-
-        Console.Write("\nIntroduce otra contraseña para probar el mismo hash (puede ser incorrecta): ");
-        Console.WriteLine(service.VerifyPassword(ReadPassword(), hash)
-            ? "Resultado: coincide."
-            : "Resultado: no coincide.");
+    private static void Fail(string message)
+    {
+        Console.Error.WriteLine(message);
+        Environment.ExitCode = 1;
     }
 
     private static string ReadPassword()
@@ -69,19 +107,16 @@ internal static class AdminPasswordTool
             var key = Console.ReadKey(intercept: true);
             if (key.Key == ConsoleKey.Enter)
             {
-                Console.WriteLine();
+                Console.Error.WriteLine();
                 return password.ToString();
             }
-
             if (key.Key == ConsoleKey.Backspace)
             {
                 if (password.Length > 0)
                     password.Length--;
             }
             else if (!char.IsControl(key.KeyChar))
-            {
                 password.Append(key.KeyChar);
-            }
         }
     }
 }

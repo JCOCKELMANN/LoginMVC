@@ -10,7 +10,7 @@ builder.Services.AddScoped<PasswordService>();
 var app = builder.Build();
 
 // Utilidad temporal: se ejecuta desde la terminal, sin iniciar el sitio web.
-if (args.Contains("--generar-hash-admin"))
+if (args.Contains("--verificar-admin"))
 {
     using var scope = app.Services.CreateScope();
     AdminPasswordTool.Run(scope.ServiceProvider.GetRequiredService<PasswordService>());
