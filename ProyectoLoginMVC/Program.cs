@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies; //J: Componentes de autenticación por cookies
 using ProyectoLoginMVC.Services;
 using ProyectoLoginMVC.Tools;
 
@@ -6,6 +7,25 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<PasswordService>();
+// Autenticación mediante cookies.
+builder.Services
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.Name = "LoginMVC.Auth";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+
+        // Ruta propuesta para el formulario de login.
+        options.LoginPath = "/Account/Login";
+
+        // El ticket de autenticación vence a los 30 minutos.
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+        options.SlidingExpiration = false;
+    });
+
+
 
 var app = builder.Build();
 
@@ -26,8 +46,11 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseRouting();
 
+app.UseRouting();
+// Reconoce al usuario a partir de su cookie de autenticación.
+app.UseAuthentication();
+// Comprueba si el usuario puede acceder a la página solicitada.
 app.UseAuthorization();
 
 app.MapStaticAssets();
