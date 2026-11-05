@@ -7,6 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<PasswordService>();
+builder.Services.AddScoped<CookieAuthService>(); // J: Esto permite que el controlador del login reciba tu servicio 
+// mediante su constructor. 
 // Autenticación mediante cookies.
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
