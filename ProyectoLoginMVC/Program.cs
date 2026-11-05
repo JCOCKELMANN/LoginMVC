@@ -1,16 +1,27 @@
 using Microsoft.EntityFrameworkCore;
 using ProyectoLoginMVC.Models;
+using ProyectoLoginMVC.Services;
+using ProyectoLoginMVC.Tools;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<PasswordService>();
 
 var app = builder.Build();
 
 builder.Services.AddDbContext<LoginContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("LoginConnection")));
+// Utilidad temporal: se ejecuta desde la terminal, sin iniciar el sitio web.
+if (args.Contains("--verificar-admin"))
+{
+    using var scope = app.Services.CreateScope();
+    AdminPasswordTool.Run(scope.ServiceProvider.GetRequiredService<PasswordService>());
+    return;
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
