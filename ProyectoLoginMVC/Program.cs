@@ -1,6 +1,9 @@
-using Microsoft.AspNetCore.Authentication.Cookies; //J: Componentes de autenticación por cookies
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
+using ProyectoLoginMVC.Models;
 using ProyectoLoginMVC.Services;
 using ProyectoLoginMVC.Tools;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +31,10 @@ builder.Services
     });
 
 
+
+builder.Services.AddDbContext<LoginContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("LoginConnection")));
 
 var app = builder.Build();
 
