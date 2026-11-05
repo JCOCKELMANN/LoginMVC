@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ProyectoLoginMVC")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+12829a6fa93ece6d4d87112c1309b7df7769d52b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+63519eb329b6318b8ef00387b53b74454c19c9e0")]
 [assembly: System.Reflection.AssemblyProductAttribute("ProyectoLoginMVC")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ProyectoLoginMVC")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
