@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using ProyectoLoginMVC.Models;
 
 namespace ProyectoLoginMVC.Controllers;
@@ -8,8 +9,12 @@ public class HomeController : Controller
 {
     public IActionResult Index()
     {
-        return View();
+        return RedirectToAction("Dashboard");
     }
+
+    [Authorize]
+    [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Dashboard() => View();
 
     public IActionResult Privacy()
     {

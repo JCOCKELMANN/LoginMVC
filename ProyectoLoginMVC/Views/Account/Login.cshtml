@@ -1,0 +1,73 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    Layout = null;
+}
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Inicio de Sesión | TechFlow</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Montserrat:wght@700;800&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="@Url.Content("~/css/techflow.css")">
+<link rel="stylesheet" href="@Url.Content("~/css/techflow-assets.css")">
+
+</head>
+
+<body class="login">
+  <main class="scene"><div class="decor" aria-hidden="true">
+      <div class="circle circle-big"></div>
+      <div class="circle circle-small"></div>
+      <div class="circle circle-front"></div>
+      <div class="circle circle-corner"></div>
+    </div>
+    <div class="illustrations" aria-hidden="true">
+      <div class="artboard">
+        <div class="art asset-shield" style="--delay: -0.0s">
+          <div class="floating"><div class="image-frame"><img src="@Url.Content("~/images/techflow/shield.png")" alt="" draggable="false" width="626" height="626"></div></div>
+        </div>
+        <div class="art asset-monitor" style="--delay: -1.3s">
+          <div class="floating"><div class="image-frame"><img src="@Url.Content("~/images/techflow/monitor.png")" alt="" draggable="false" width="626" height="626"></div></div>
+        </div>
+        <div class="art asset-clock" style="--delay: -2.6s">
+          <div class="floating"><div class="image-frame"><img src="@Url.Content("~/images/techflow/clock.png")" alt="" draggable="false" width="736" height="736"></div></div>
+        </div>
+        <div class="art asset-user" style="--delay: -3.9s">
+          <div class="floating"><div class="image-frame"><img src="@Url.Content("~/images/techflow/user.png")" alt="" draggable="false" width="598" height="600"></div></div>
+        </div>
+        <div class="art asset-pin" style="--delay: -5.2s">
+          <div class="floating"><div class="image-frame"><img src="@Url.Content("~/images/techflow/pin.png")" alt="" draggable="false" width="450" height="450"></div></div>
+        </div>
+        <div class="art asset-download" style="--delay: -6.5s">
+          <div class="floating"><div class="image-frame"><img src="@Url.Content("~/images/techflow/download.png")" alt="" draggable="false" width="1024" height="1024"></div></div>
+        </div>
+      </div>
+    </div>
+    <section class="card" aria-labelledby="title"><a class="brand" href="@Url.Action("Login", "Account")" aria-label="TechFlow, inicio de sesión">TECHFLOW</a>
+      <h1 id="title">Inicio de Sesión</h1>
+
+<form action="@Url.Action("Login", "Account")" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+        @if (TempData["Success"] is string success)
+        {
+            <p role="status">@success</p>
+        }
+        <div class="field">
+          <label for="Username">Usuario</label>
+          @Html.TextBox("Username", null, new { id = "Username", autocomplete = "username", required = "required", maxlength = "50", spellcheck = "false", pattern = @".*\S.*", aria_describedby = "Username-error" })
+          <span id="Username-error">@Html.ValidationMessage("Username")</span>
+        </div>
+        <div class="field">
+          <label for="Password">Contraseña</label>
+          <input id="Password" name="Password" type="password" autocomplete="current-password" required aria-describedby="Password-error">
+          <span id="Password-error">@Html.ValidationMessage("Password")</span>
+        </div>
+        <a class="forgot" href="@Url.Action("Recuperar", "Account")">¿Olvidó la contraseña?</a>
+        <div id="form-message" class="message" role="alert" aria-live="polite">
+            @Html.ValidationSummary(false, "", new { @class = "validation-errors" })
+        </div>
+        <button class="submit" type="submit">Iniciar sesión</button>
+      </form>
+      <p class="switch">Para obtener una cuenta, contacta al administrador.</p>
+    </section>
+  </main>
+</body>
+</html>

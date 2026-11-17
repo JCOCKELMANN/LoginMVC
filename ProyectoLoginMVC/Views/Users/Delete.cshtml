@@ -1,0 +1,27 @@
+@model ProyectoLoginMVC.Models.UserListItem
+@{
+    Layout = null;
+}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Confirmar eliminación | TechFlow</title>
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+</head>
+<body>
+<main class="content management">
+    <a class="action-link" asp-action="Index">← Volver al listado</a>
+    <h1>¿Eliminar este usuario?</h1>
+    <section class="account-card">
+        <h2>@Model.Username</h2>
+        <p>@Model.Nombre · @Model.Puesto</p>
+        <p>Se eliminará la cuenta permanentemente y perderá el acceso al sistema. Esta acción no se puede deshacer.</p>
+        <form asp-action="Delete" asp-route-id="@Model.IdUsuario" method="post">
+            <button class="danger-button" type="submit">Sí, eliminar usuario</button>
+            <a class="cancel-link" asp-action="Index">Cancelar</a>
+        </form>
+    </section>
+</main>
+</body>
+</html>

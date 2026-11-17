@@ -1,0 +1,36 @@
+@model List<ProyectoLoginMVC.Models.UserListItem>
+@{
+    Layout = null;
+}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Usuarios | TechFlow</title>
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+</head>
+<body>
+<main class="content management">
+    <a class="action-link" asp-controller="Home" asp-action="Dashboard">← Volver al panel</a>
+    <h1>Usuarios</h1>
+    <p>Consulta las cuentas registradas en el sistema.</p>
+    <div asp-validation-summary="All" role="alert"></div>
+    @if (ViewData.ModelState.IsValid)
+    {
+        <p>@Model.Count usuario(s) registrado(s)</p>
+    }
+    <div class="table-container">
+        <table>
+            <thead><tr><th scope="col">Usuario</th><th scope="col">Nombre completo</th><th scope="col">Rol</th><th scope="col">Puesto</th><th scope="col">Estado</th></tr></thead>
+            <tbody>
+            @foreach (var usuario in Model)
+            {
+                <tr><td>@usuario.Username</td><td>@usuario.Nombre</td><td>@usuario.Rol</td><td>@usuario.Puesto</td><td>@(usuario.Activo ? "Activo" : "Inactivo")</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    @if (Model.Count == 0 && ViewData.ModelState.IsValid) { <p>No hay usuarios registrados.</p> }
+</main>
+</body>
+</html>

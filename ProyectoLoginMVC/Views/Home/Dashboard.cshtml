@@ -1,0 +1,100 @@
+﻿@using System.Security.Claims
+@{
+    Layout = null;
+    var administrador = User.IsInRole("Administrador");
+    var rol = User.FindFirstValue(ClaimTypes.Role) ?? "Usuario";
+}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Panel principal | TechFlow</title>
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+</head>
+<body>
+    <aside class="sidebar">
+        <a class="brand" asp-controller="Home" asp-action="Dashboard">TECH<span>FLOW</span></a>
+        <p class="nav-label">ESPACIO DE TRABAJO</p>
+        <nav aria-label="Navegación principal">
+            <a class="nav-item selected" asp-controller="Home" asp-action="Dashboard" aria-current="page">Panel principal</a>
+            @if (administrador)
+            {
+                <a class="nav-item" asp-controller="Account" asp-action="Register">Crear usuario</a>
+                <a class="nav-item" asp-controller="Users" asp-action="Index">Eliminar usuarios</a>
+                <a class="nav-item" asp-controller="Users" asp-action="List">Ver usuarios</a>
+            }
+        </nav>
+        <div class="sidebar-bottom">
+            <span class="role">@rol</span>
+            <form asp-controller="Account" asp-action="Logout" method="post">
+                <button class="logout" type="submit">Cerrar sesión <span aria-hidden="true">↗</span></button>
+            </form>
+        </div>
+    </aside>
+    <main>
+        <header class="topbar">
+            <span>Inicio / <strong>Panel principal</strong></span>
+            <span class="session">● Sesión activa</span>
+        </header>
+        <div class="content">
+            @if (TempData["Success"] is string success)
+            {
+                <p class="notice" role="status">@success</p>
+            }
+            <section class="welcome" aria-labelledby="welcome-title">
+                <div>
+                    <p class="eyebrow">TU ESPACIO EN TECHFLOW</p>
+                    <h1 id="welcome-title">Bienvenido, @(User.Identity?.Name ?? "usuario").</h1>
+                    <p>Desde aquí puedes acceder a las opciones de tu cuenta.</p>
+                    <span class="role hero-role">@rol</span>
+                </div>
+                <img src="~/images/techflow/monitor.png" alt="" width="220" height="220" />
+            </section>
+            <section class="overview" aria-label="Información de tu cuenta">
+                <article class="info-card"><span>Usuario</span><strong>@User.FindFirstValue("Usuario")</strong></article>
+                <article class="info-card"><span>Rol asignado</span><strong>@rol</strong></article>
+                <article class="info-card"><span>Acceso</span><strong>Autenticado</strong></article>
+            </section>
+            <section aria-labelledby="actions-title">
+                <div class="section-heading"><h2 id="actions-title">Accesos rápidos</h2><span>Todo en un solo lugar</span></div>
+                <div class="actions">
+                    @if (administrador)
+                    {
+                        <a class="action-card" asp-controller="Account" asp-action="Register">
+                            <span class="action-icon" aria-hidden="true">＋</span>
+                            <h3>Crear usuario</h3>
+                            <p>Registra una cuenta nueva para dar acceso al sistema.</p>
+                            <span class="action-link">Agregar usuario <span aria-hidden="true">→</span></span>
+                        </a>
+                    }
+                    @if (administrador)
+                    {
+                        <a class="action-card" asp-controller="Users" asp-action="Index">
+                            <span class="action-icon" aria-hidden="true">−</span>
+                            <h3>Eliminar usuarios</h3>
+                            <p>Consulta las cuentas y elimina las que ya no necesitan acceso.</p>
+                            <span class="action-link">Ver usuarios →</span>
+                        </a>
+                    }
+                    @if (administrador)
+                    {
+                        <a class="action-card" asp-controller="Users" asp-action="List">
+                            <span class="action-icon" aria-hidden="true">☷</span>
+                            <h3>Ver usuarios</h3>
+                            <p>Consulta los usuarios registrados, sus puestos, roles y estado.</p>
+                            <span class="action-link">Consultar listado →</span>
+                        </a>
+                    }
+                    <article class="account-card">
+                        <span class="action-icon" aria-hidden="true">✓</span>
+                        <h3>Tu cuenta</h3>
+                        <p>@(administrador ? "Tienes permisos para crear usuarios. Las cuentas nuevas reciben el rol Usuario." : "Tu cuenta está lista para acceder al sistema. Si necesitas ayuda o cambios de acceso, contacta al administrador.")</p>
+                    </article>
+                </div>
+            </section>
+            <footer>TechFlow · Panel principal</footer>
+        </div>
+    </main>
+</body>
+</html>
