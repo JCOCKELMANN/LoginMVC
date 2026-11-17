@@ -84,7 +84,7 @@ public class AccountController(LoginContext db, PasswordService passwords,
             ModelState.AddModelError("IdPuesto", "Selecciona un puesto válido.");
         if (Encoding.UTF8.GetByteCount(model.Password ?? "") > 72 ||
             (model.Password?.Length ?? 0) < 8)
-            ModelState.AddModelError("Password", "Usa al menos 8 caracteres y como máximo 72 bytes UTF-8.");
+            ModelState.AddModelError("Password", "Usa al menos 8 caracteres.");
         if (!(model.Password ?? "").Any(char.IsUpper) ||
             !(model.Password ?? "").Any(c => char.IsPunctuation(c) || char.IsSymbol(c)))
             ModelState.AddModelError("Password", "La contraseña debe incluir al menos una mayúscula y un símbolo.");
