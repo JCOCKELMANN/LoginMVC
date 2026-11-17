@@ -1,56 +1,100 @@
-@using Microsoft.AspNetCore.Mvc.Rendering
+﻿@using System.Security.Claims
 @{
     Layout = null;
+    var administrador = User.IsInRole("Administrador");
+    var rol = User.FindFirstValue(ClaimTypes.Role) ?? "Usuario";
 }
-
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Inicio de Sesión | TechFlow</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Montserrat:wght@700;800&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="@Url.Content("~/css/techflow.css")">
-<link rel="stylesheet" href="@Url.Content("~/css/techflow-assets.css")">
-
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Panel principal | TechFlow</title>
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
 </head>
-
-<body class="login">
-  <main class="scene"><div class="decor" aria-hidden="true">
-      <div class="circle circle-big"></div>
-      <div class="circle circle-small"></div>
-      <div class="circle circle-front"></div>
-      <div class="circle circle-corner"></div>
-    </div>
-    <div class="illustrations" aria-hidden="true">
-      <div class="artboard">
-        <div class="art asset-shield" style="--delay: -0.0s">
-          <div class="floating"><div class="image-frame"><img src="@Url.Content("~/images/techflow/shield.png")" alt="" draggable="false" width="626" height="626"></div></div>
+<body>
+    <aside class="sidebar">
+        <a class="brand" asp-controller="Home" asp-action="Dashboard">TECH<span>FLOW</span></a>
+        <p class="nav-label">ESPACIO DE TRABAJO</p>
+        <nav aria-label="Navegación principal">
+            <a class="nav-item selected" asp-controller="Home" asp-action="Dashboard" aria-current="page">Panel principal</a>
+            @if (administrador)
+            {
+                <a class="nav-item" asp-controller="Account" asp-action="Register">Crear usuario</a>
+                <a class="nav-item" asp-controller="Users" asp-action="Index">Eliminar usuarios</a>
+                <a class="nav-item" asp-controller="Users" asp-action="List">Ver usuarios</a>
+            }
+        </nav>
+        <div class="sidebar-bottom">
+            <span class="role">@rol</span>
+            <form asp-controller="Account" asp-action="Logout" method="post">
+                <button class="logout" type="submit">Cerrar sesión <span aria-hidden="true">↗</span></button>
+            </form>
         </div>
-        <div class="art asset-monitor" style="--delay: -1.3s">
-          <div class="floating"><div class="image-frame"><img src="@Url.Content("~/images/techflow/monitor.png")" alt="" draggable="false" width="626" height="626"></div></div>
+    </aside>
+    <main>
+        <header class="topbar">
+            <span>Inicio / <strong>Panel principal</strong></span>
+            <span class="session">● Sesión activa</span>
+        </header>
+        <div class="content">
+            @if (TempData["Success"] is string success)
+            {
+                <p class="notice" role="status">@success</p>
+            }
+            <section class="welcome" aria-labelledby="welcome-title">
+                <div>
+                    <p class="eyebrow">TU ESPACIO EN TECHFLOW</p>
+                    <h1 id="welcome-title">Bienvenido, @(User.Identity?.Name ?? "usuario").</h1>
+                    <p>Desde aquí puedes acceder a las opciones de tu cuenta.</p>
+                    <span class="role hero-role">@rol</span>
+                </div>
+                <img src="~/images/techflow/monitor.png" alt="" width="220" height="220" />
+            </section>
+            <section class="overview" aria-label="Información de tu cuenta">
+                <article class="info-card"><span>Usuario</span><strong>@User.FindFirstValue("Usuario")</strong></article>
+                <article class="info-card"><span>Rol asignado</span><strong>@rol</strong></article>
+                <article class="info-card"><span>Acceso</span><strong>Autenticado</strong></article>
+            </section>
+            <section aria-labelledby="actions-title">
+                <div class="section-heading"><h2 id="actions-title">Accesos rápidos</h2><span>Todo en un solo lugar</span></div>
+                <div class="actions">
+                    @if (administrador)
+                    {
+                        <a class="action-card" asp-controller="Account" asp-action="Register">
+                            <span class="action-icon" aria-hidden="true">＋</span>
+                            <h3>Crear usuario</h3>
+                            <p>Registra una cuenta nueva para dar acceso al sistema.</p>
+                            <span class="action-link">Agregar usuario <span aria-hidden="true">→</span></span>
+                        </a>
+                    }
+                    @if (administrador)
+                    {
+                        <a class="action-card" asp-controller="Users" asp-action="Index">
+                            <span class="action-icon" aria-hidden="true">−</span>
+                            <h3>Eliminar usuarios</h3>
+                            <p>Consulta las cuentas y elimina las que ya no necesitan acceso.</p>
+                            <span class="action-link">Ver usuarios →</span>
+                        </a>
+                    }
+                    @if (administrador)
+                    {
+                        <a class="action-card" asp-controller="Users" asp-action="List">
+                            <span class="action-icon" aria-hidden="true">☷</span>
+                            <h3>Ver usuarios</h3>
+                            <p>Consulta los usuarios registrados, sus puestos, roles y estado.</p>
+                            <span class="action-link">Consultar listado →</span>
+                        </a>
+                    }
+                    <article class="account-card">
+                        <span class="action-icon" aria-hidden="true">✓</span>
+                        <h3>Tu cuenta</h3>
+                        <p>@(administrador ? "Tienes permisos para crear usuarios. Las cuentas nuevas reciben el rol Usuario." : "Tu cuenta está lista para acceder al sistema. Si necesitas ayuda o cambios de acceso, contacta al administrador.")</p>
+                    </article>
+                </div>
+            </section>
+            <footer>TechFlow · Panel principal</footer>
         </div>
-        <div class="art asset-clock" style="--delay: -2.6s">
-          <div class="floating"><div class="image-frame"><img src="@Url.Content("~/images/techflow/clock.png")" alt="" draggable="false" width="736" height="736"></div></div>
-        </div>
-        <div class="art asset-user" style="--delay: -3.9s">
-          <div class="floating"><div class="image-frame"><img src="@Url.Content("~/images/techflow/user.png")" alt="" draggable="false" width="598" height="600"></div></div>
-        </div>
-        <div class="art asset-pin" style="--delay: -5.2s">
-          <div class="floating"><div class="image-frame"><img src="@Url.Content("~/images/techflow/pin.png")" alt="" draggable="false" width="450" height="450"></div></div>
-        </div>
-        <div class="art asset-download" style="--delay: -6.5s">
-          <div class="floating"><div class="image-frame"><img src="@Url.Content("~/images/techflow/download.png")" alt="" draggable="false" width="1024" height="1024"></div></div>
-        </div>
-      </div>
-    </div>
-    <section class="card" aria-labelledby="title">
-      <span class="brand">TECHFLOW</span>
-      <h1 id="title">Panel principal</h1>
-      <p>Bienvenido, @(User.Identity?.Name ?? "usuario").</p>
-      <p>Has ingresado a TechFlow.</p>
-      
-      <form action="@Url.Action("Logout", "Account")" method="post">
-        @Html.AntiForgeryToken()
-        <button class="submit" type="submit">Cerrar sesión</button>
-      </form>
-    </section>
-  </main>
+    </main>
 </body>
 </html>

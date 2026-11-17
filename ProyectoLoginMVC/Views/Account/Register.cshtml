@@ -1,4 +1,5 @@
 @using Microsoft.AspNetCore.Mvc.Rendering
+@model ProyectoLoginMVC.Models.RegisterViewModel
 @{
     Layout = null;
 }
@@ -38,7 +39,11 @@
       </div>
     </div>
     <section class="card" aria-labelledby="title"><a class="brand" href="@Url.Action("Login", "Account")" aria-label="TechFlow, inicio de sesión">TECHFLOW</a>
-      <h1 id="title">Crea una Cuenta</h1>
+      <h1 id="title">Crear usuario</h1>
+      @if (TempData["Success"] is string success)
+      {
+          <p role="status">@success</p>
+      }
 
 <form action="@Url.Action("Register", "Account")" method="post">
         @Html.AntiForgeryToken()
@@ -59,15 +64,23 @@
         </div>
         <div class="field">
           <label for="Password">Contraseña</label>
-          <input id="Password" name="Password" type="password" autocomplete="new-password" required aria-describedby="Password-error">
+          <input id="Password" name="Password" type="password" autocomplete="new-password" required minlength="8" pattern="(?=.*\p{Lu})(?=.*[\p{P}\p{S}]).{8,}" title="Usa al menos 8 caracteres, una mayúscula y un símbolo." aria-describedby="Password-help Password-error">
+          <small id="Password-help">Mínimo 8 caracteres, una mayúscula y un símbolo (por ejemplo: !, # o $). Máximo 72 bytes UTF-8.</small>
           <span id="Password-error">@Html.ValidationMessage("Password")</span>
+        </div>
+        <div class="field">
+          <label asp-for="IdPuesto">Puesto</label>
+          <select asp-for="IdPuesto" asp-items="Model.Puestos" required aria-describedby="IdPuesto-error">
+            <option value="">Selecciona un puesto</option>
+          </select>
+          <span id="IdPuesto-error" asp-validation-for="IdPuesto"></span>
         </div>
         <div id="form-message" class="message" role="alert" aria-live="polite">
             @Html.ValidationSummary(false, "", new { @class = "validation-errors" })
         </div>
         <button class="submit" type="submit">Crear cuenta</button>
       </form>
-      <p class="switch">¿Ya tienes una cuenta? <a href="@Url.Action("Login", "Account")">Inicia sesión aquí</a></p>
+      <p class="switch"><a href="@Url.Action("Dashboard", "Home")">Volver al panel</a></p>
     </section>
   </main>
 </body>

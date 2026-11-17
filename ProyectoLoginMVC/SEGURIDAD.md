@@ -43,13 +43,18 @@ Una coincidencia devuelve código de salida 0. Una contraseña incorrecta, un ha
 no válido o un fallo de consulta devuelve código 1. Un fallo de conexión no es
 una prueba de que la contraseña del administrador sea incorrecta.
 
-## Integración posterior
+## Integración con el sitio
 
-El compañero puede recibir PasswordService mediante inyección de dependencias
-y llamar a VerifyPassword(contraseñaIntroducida, usuario.PasswordHash).
+AccountController recibe PasswordService mediante inyección de dependencias
+y llama a VerifyPassword(contraseñaIntroducida, usuario.PasswordHash).
 HashPassword rechaza entradas vacías o mayores de 72 bytes UTF-8. VerifyPassword
 rechaza entradas vacías, nulas, mayores de 72 bytes y hashes de formato inválido.
-No se han agregado login, cookies, sesiones ni cambios de base de datos.
+El sitio ahora incluye registro, login y logout con cookies. El identificador
+incluido en la cookie es el GUID de Usuarios. El registro siempre asigna el rol
+Usuario y nivel de acceso 1. Solo el rol Administrador puede acceder al formulario
+de creación de usuarios y enviarlo. El panel exige autenticación y los formularios POST
+validan el token antifalsificación. La configuración de conexión se encuentra
+en ConnectionStrings, al nivel raíz de appsettings.json.
 
 Para compilar: dotnet build.
 

@@ -45,6 +45,11 @@
 
 <form action="@Url.Action("Login", "Account")" method="post">
         @Html.AntiForgeryToken()
+        <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+        @if (TempData["Success"] is string success)
+        {
+            <p role="status">@success</p>
+        }
         <div class="field">
           <label for="Username">Usuario</label>
           @Html.TextBox("Username", null, new { id = "Username", autocomplete = "username", required = "required", maxlength = "50", spellcheck = "false", pattern = @".*\S.*", aria_describedby = "Username-error" })
@@ -61,7 +66,7 @@
         </div>
         <button class="submit" type="submit">Iniciar sesión</button>
       </form>
-      <p class="switch">¿Aún no tienes cuenta? <a href="@Url.Action("Register", "Account")">Regístrate aquí</a></p>
+      <p class="switch">Para obtener una cuenta, contacta al administrador.</p>
     </section>
   </main>
 </body>

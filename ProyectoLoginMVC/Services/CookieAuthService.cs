@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -12,9 +11,10 @@ public class CookieAuthService
     // Los datos deben provenir del usuario consultado en SQL, no directamente del formulario.
     public Task IniciarSesionAsync(
         HttpContext httpContext,
-        int identificador,
+        Guid identificador,
         string nombre,
-        string usuario)
+        string usuario,
+        string rol)
     {
         ArgumentNullException.ThrowIfNull(httpContext );
         ArgumentException.ThrowIfNullOrWhiteSpace(nombre);
@@ -25,9 +25,10 @@ public class CookieAuthService
         {
             new Claim(
                 ClaimTypes.NameIdentifier,
-                identificador.ToString(CultureInfo.InvariantCulture)),
+                identificador.ToString()),
             new Claim(ClaimTypes.Name, nombre),
-            new Claim("Usuario", usuario)
+            new Claim("Usuario", usuario),
+            new Claim(ClaimTypes.Role, rol)
         };
 
         var identidad = new ClaimsIdentity(

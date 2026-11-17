@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using ProyectoLoginMVC.Models;
 using ProyectoLoginMVC.Services;
@@ -20,10 +22,24 @@ builder.Services
         options.Cookie.Name = "LoginMVC.Auth";
         options.Cookie.HttpOnly = true;
         options.Cookie.SameSite = SameSiteMode.Lax;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+            ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
 
         // Ruta propuesta para el formulario de login.
         options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+        options.Events.OnValidatePrincipal = async context =>
+        {
+            var db = context.HttpContext.RequestServices.GetRequiredService<LoginContext>();
+            var validId = Guid.TryParse(context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier), out var id);
+            var rol = context.Principal?.FindFirstValue(ClaimTypes.Role);
+            if (!validId || !await db.Usuarios.AsNoTracking().AnyAsync(u =>
+                u.IdUsuario == id && u.Activo && u.IdRolNavigation.NombreRol == rol))
+            {
+                context.RejectPrincipal();
+                await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            }
+        };
 
         // El ticket de autenticación vence a los 30 minutos.
         options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
@@ -66,7 +82,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=Account}/{action=Login}/{id?}")
     .WithStaticAssets();
 
 
