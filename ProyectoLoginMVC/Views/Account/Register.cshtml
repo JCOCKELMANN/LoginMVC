@@ -1,0 +1,74 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    Layout = null;
+}
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Crea una Cuenta | TechFlow</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Montserrat:wght@700;800&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="@Url.Content("~/css/techflow.css")">
+<link rel="stylesheet" href="@Url.Content("~/css/techflow-assets.css")">
+
+</head>
+
+<body class="register">
+  <main class="scene"><div class="decor" aria-hidden="true">
+      <div class="circle circle-big"></div>
+      <div class="circle circle-small"></div>
+      <div class="circle circle-front"></div>
+      <div class="circle circle-corner"></div>
+    </div>
+    <div class="illustrations" aria-hidden="true">
+      <div class="artboard">
+        <div class="art asset-laptop" style="--delay: -0.0s">
+          <div class="floating"><div class="image-frame"><img src="@Url.Content("~/images/techflow/laptop.png")" alt="" draggable="false" width="900" height="900"></div></div>
+        </div>
+        <div class="art asset-gear" style="--delay: -1.3s">
+          <div class="floating"><div class="image-frame"><img src="@Url.Content("~/images/techflow/gear.png")" alt="" draggable="false" width="736" height="736"></div></div>
+        </div>
+        <div class="art asset-key" style="--delay: -2.6s">
+          <div class="floating"><div class="image-frame"><img src="@Url.Content("~/images/techflow/key.png")" alt="" draggable="false" width="736" height="736"></div></div>
+        </div>
+        <div class="art asset-search" style="--delay: -3.9s">
+          <div class="floating"><div class="image-frame"><img src="@Url.Content("~/images/techflow/search.png")" alt="" draggable="false" width="850" height="708"></div></div>
+        </div>
+        <div class="art asset-folders" style="--delay: -5.2s">
+          <div class="floating"><div class="image-frame"><img src="@Url.Content("~/images/techflow/folders.png")" alt="" draggable="false" width="736" height="736"></div></div>
+        </div>
+      </div>
+    </div>
+    <section class="card" aria-labelledby="title"><a class="brand" href="@Url.Action("Login", "Account")" aria-label="TechFlow, inicio de sesión">TECHFLOW</a>
+      <h1 id="title">Crea una Cuenta</h1>
+
+<form action="@Url.Action("Register", "Account")" method="post">
+        @Html.AntiForgeryToken()
+        <div class="field">
+          <label for="Nombre">Nombre</label>
+          @Html.TextBox("Nombre", null, new { id = "Nombre", autocomplete = "given-name", required = "required", maxlength = "100", pattern = @".*\S.*", aria_describedby = "Nombre-error" })
+          <span id="Nombre-error">@Html.ValidationMessage("Nombre")</span>
+        </div>
+<div class="field">
+          <label for="Apellido">Apellido</label>
+          @Html.TextBox("Apellido", null, new { id = "Apellido", autocomplete = "family-name", required = "required", maxlength = "100", pattern = @".*\S.*", aria_describedby = "Apellido-error" })
+          <span id="Apellido-error">@Html.ValidationMessage("Apellido")</span>
+        </div>
+<div class="field">
+          <label for="Username">Usuario</label>
+          @Html.TextBox("Username", null, new { id = "Username", autocomplete = "username", required = "required", maxlength = "50", pattern = @".*\S.*", aria_describedby = "Username-error" })
+          <span id="Username-error">@Html.ValidationMessage("Username")</span>
+        </div>
+        <div class="field">
+          <label for="Password">Contraseña</label>
+          <input id="Password" name="Password" type="password" autocomplete="new-password" required aria-describedby="Password-error">
+          <span id="Password-error">@Html.ValidationMessage("Password")</span>
+        </div>
+        <div id="form-message" class="message" role="alert" aria-live="polite">
+            @Html.ValidationSummary(false, "", new { @class = "validation-errors" })
+        </div>
+        <button class="submit" type="submit">Crear cuenta</button>
+      </form>
+      <p class="switch">¿Ya tienes una cuenta? <a href="@Url.Action("Login", "Account")">Inicia sesión aquí</a></p>
+    </section>
+  </main>
+</body>
+</html>

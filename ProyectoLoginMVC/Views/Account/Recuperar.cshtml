@@ -1,0 +1,36 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    Layout = null;
+}
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Recupera tu acceso | TechFlow</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Montserrat:wght@700;800&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="@Url.Content("~/css/techflow.css")">
+<link rel="stylesheet" href="@Url.Content("~/css/techflow-assets.css")">
+
+</head>
+
+<body class="login recovery">
+  <main class="scene"><div class="decor" aria-hidden="true">
+      <div class="circle circle-big"></div>
+      <div class="circle circle-small"></div>
+      <div class="circle circle-front"></div>
+      <div class="circle circle-corner"></div>
+    </div>
+    <div class="illustrations" aria-hidden="true">
+      <div class="artboard">
+        <div class="art asset-security" style="--delay: -0.0s">
+          <div class="floating"><div class="image-frame"><img src="@Url.Content("~/images/techflow/security.png")" alt="" draggable="false" width="754" height="754"></div></div>
+        </div>
+      </div>
+    </div>
+    <section class="card" aria-labelledby="title"><a class="brand" href="@Url.Action("Login", "Account")" aria-label="TechFlow, inicio de sesión">TECHFLOW</a>
+      <h1 id="title">Recupera tu acceso</h1>
+
+<p class="access-help">Solicita al administrador del sistema ayuda para recuperar tu acceso.</p>
+      <p class="switch"><a href="@Url.Action("Login", "Account")">Volver a iniciar sesión</a></p>
+    </section>
+  </main>
+</body>
+</html>
