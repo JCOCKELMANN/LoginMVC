@@ -10,7 +10,7 @@ public class PasswordService
 
         // BCrypt admite hasta 72 bytes; evitamos truncar la contraseña.
         if (Encoding.UTF8.GetByteCount(password) > 72)
-            throw new ArgumentException("La contraseña debe tener como máximo 72 bytes UTF-8.", nameof(password));
+            throw new ArgumentException("La contraseña debe tener como máximo 72 caracteres.", nameof(password));
 
         return BCrypt.Net.BCrypt.HashPassword(password);
     }

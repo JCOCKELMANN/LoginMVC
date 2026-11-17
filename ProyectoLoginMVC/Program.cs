@@ -4,16 +4,13 @@ using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using ProyectoLoginMVC.Models;
 using ProyectoLoginMVC.Services;
-using ProyectoLoginMVC.Tools;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Servicios del sitio.
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<PasswordService>();
-builder.Services.AddScoped<CookieAuthService>(); // J: Esto permite que el controlador del login reciba tu servicio 
-// mediante su constructor. 
+builder.Services.AddScoped<CookieAuthService>();
 // Autenticación mediante cookies.
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -25,7 +22,7 @@ builder.Services
         options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
             ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
 
-        // Ruta propuesta para el formulario de login.
+        // Rutas de acceso.
         options.LoginPath = "/Account/Login";
         options.AccessDeniedPath = "/Account/AccessDenied";
         options.Events.OnValidatePrincipal = async context =>
@@ -46,27 +43,16 @@ builder.Services
         options.SlidingExpiration = false;
     });
 
-
-
 builder.Services.AddDbContext<LoginContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("LoginConnection")));
 
 var app = builder.Build();
 
-// Utilidad temporal: se ejecuta desde la terminal, sin iniciar el sitio web.
-if (args.Contains("--verificar-admin"))
-{
-    using var scope = app.Services.CreateScope();
-    AdminPasswordTool.Run(scope.ServiceProvider.GetRequiredService<PasswordService>());
-    return;
-}
-
-// Configure the HTTP request pipeline.
+// Configuración de las solicitudes HTTP.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -84,6 +70,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Account}/{action=Login}/{id?}")
     .WithStaticAssets();
-
 
 app.Run();
