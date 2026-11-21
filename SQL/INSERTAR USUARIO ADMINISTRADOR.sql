@@ -19,6 +19,7 @@ VALUES (
     'Sistema',
     'admin',
     '$2a$11$FQQKXYG0WLsi6Av6YEUMR.Qhuwv/1XaEA9Wd2AD/cyS.k3ruSfQG6',
+    --Admin12/
     (SELECT IdRol FROM Roles
      WHERE NombreRol = 'Administrador'),
     NULL,
